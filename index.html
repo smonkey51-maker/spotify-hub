@@ -4,515 +4,470 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Spotify WebApp</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --green: #1DB954; --bg: #0a0a0a; --surface: #111;
-      --surface2: #1a1a1a; --border: #242424; --text: #f0f0f0; --muted: #666;
-    }
-    body { background: var(--bg); }
-    .app { font-family: 'Syne', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; max-width: 1100px; margin: 0 auto; padding: 0 0 100px; position: relative; }
-    .app::before { content: ''; position: fixed; top: -200px; left: -200px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(29,185,84,0.06) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+    :root { --green: #1DB954; --bg: #0a0a0a; --surface: #111; --surface2: #1a1a1a; --border: #242424; --text: #f0f0f0; --muted: #666; }
+    body { background: var(--bg); font-family: 'Syne', sans-serif; color: var(--text); }
+    #root { position: relative; max-width: 1100px; margin: 0 auto; padding-bottom: 80px; }
+    #root::before { content:''; position:fixed; top:-200px; left:-200px; width:600px; height:600px; background:radial-gradient(circle,rgba(29,185,84,.06) 0%,transparent 70%); pointer-events:none; z-index:0; }
 
-    /* LOGIN */
-    .token-screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; gap: 24px; }
-    .token-logo { display: flex; align-items: center; gap: 12px; font-size: 28px; font-weight: 800; letter-spacing: -1px; }
-    .token-logo svg { color: var(--green); }
-    .token-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px; width: 100%; max-width: 560px; display: flex; flex-direction: column; gap: 20px; }
-    .token-card h2 { font-size: 18px; font-weight: 700; }
-    .divider { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 12px; font-family: 'DM Mono', monospace; }
-    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-    .steps { display: flex; flex-direction: column; gap: 10px; }
-    .step { display: flex; gap: 12px; align-items: flex-start; font-size: 13px; font-family: 'DM Mono', monospace; color: #aaa; line-height: 1.6; }
-    .step-num { background: var(--green); color: #000; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
-    .step a { color: var(--green); text-decoration: none; }
-    .step code { background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; font-size: 11px; color: var(--green); word-break: break-all; }
-    .oauth-row { display: flex; gap: 10px; }
-    .client-input, .token-input, .search-input, .playlist-name-input, .time-select { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 11px 14px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; outline: none; transition: border-color 0.2s; width: 100%; }
-    .client-input:focus, .token-input:focus, .search-input:focus, .playlist-name-input:focus { border-color: var(--green); }
-    .client-input::placeholder, .token-input::placeholder, .search-input::placeholder { color: var(--muted); }
-    .token-input-row { display: flex; gap: 10px; }
-    .token-input { flex: 1; width: auto; }
-    .btn-primary { background: var(--green); color: #000; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; border: none; border-radius: 10px; padding: 12px 20px; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
-    .btn-primary:hover { background: #22d462; }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-ghost { background: none; border: 1px solid var(--border); color: var(--text); font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; border-radius: 8px; padding: 8px 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: border-color 0.2s, color 0.2s; }
-    .btn-ghost:hover { border-color: var(--green); color: var(--green); }
-    .error-msg { background: rgba(255,60,60,0.1); border: 1px solid rgba(255,60,60,0.3); border-radius: 8px; padding: 10px 14px; color: #ff6b6b; font-size: 13px; font-family: 'DM Mono', monospace; }
-    .success-msg { background: rgba(29,185,84,0.1); border: 1px solid rgba(29,185,84,0.3); border-radius: 8px; padding: 10px 14px; color: var(--green); font-size: 13px; font-family: 'DM Mono', monospace; margin-bottom: 12px; }
+    .token-screen { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 24px; gap:24px; }
+    .token-logo { display:flex; align-items:center; gap:12px; font-size:28px; font-weight:800; letter-spacing:-1px; }
+    .token-logo svg { color:var(--green); }
+    .token-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:32px; width:100%; max-width:560px; display:flex; flex-direction:column; gap:20px; }
+    .token-card h2 { font-size:18px; font-weight:700; }
+    .steps { display:flex; flex-direction:column; gap:10px; }
+    .step { display:flex; gap:12px; align-items:flex-start; font-size:13px; font-family:'DM Mono',monospace; color:#aaa; line-height:1.6; }
+    .step-num { background:var(--green); color:#000; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; margin-top:2px; }
+    .step a { color:var(--green); }
+    .step code { background:var(--surface2); border:1px solid var(--border); border-radius:4px; padding:1px 6px; font-size:11px; color:var(--green); word-break:break-all; }
+    .divider { display:flex; align-items:center; gap:12px; color:var(--muted); font-size:12px; font-family:'DM Mono',monospace; }
+    .divider::before,.divider::after { content:''; flex:1; height:1px; background:var(--border); }
+    .row { display:flex; gap:10px; }
+    input[type=text] { flex:1; background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px 14px; color:var(--text); font-family:'DM Mono',monospace; font-size:13px; outline:none; transition:border-color .2s; }
+    input[type=text]:focus { border-color:var(--green); }
+    input[type=text]::placeholder { color:var(--muted); }
+    .btn { background:var(--green); color:#000; font-family:'Syne',sans-serif; font-weight:700; font-size:14px; border:none; border-radius:10px; padding:12px 20px; cursor:pointer; white-space:nowrap; transition:background .2s; }
+    .btn:hover { background:#22d462; }
+    .btn:disabled { opacity:.5; cursor:not-allowed; }
+    .btn-ghost { background:none; border:1px solid var(--border); color:var(--text); font-family:'Syne',sans-serif; font-size:13px; font-weight:600; border-radius:8px; padding:8px 14px; cursor:pointer; transition:border-color .2s,color .2s; }
+    .btn-ghost:hover { border-color:var(--green); color:var(--green); }
+    .error { background:rgba(255,60,60,.1); border:1px solid rgba(255,60,60,.3); border-radius:8px; padding:10px 14px; color:#ff6b6b; font-size:13px; font-family:'DM Mono',monospace; }
+    .ok { background:rgba(29,185,84,.1); border:1px solid rgba(29,185,84,.3); border-radius:8px; padding:10px 14px; color:var(--green); font-size:13px; font-family:'DM Mono',monospace; }
 
-    /* HEADER */
-    .header { display: flex; align-items: center; justify-content: space-between; padding: 24px 32px 0; position: relative; z-index: 1; }
-    .header-logo { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
-    .header-logo svg { color: var(--green); }
-    .user-pill { display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 100px; padding: 6px 14px 6px 6px; font-size: 13px; cursor: pointer; }
-    .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #000; overflow: hidden; }
-    .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .header { display:flex; align-items:center; justify-content:space-between; padding:24px 32px 0; position:relative; z-index:1; }
+    .logo { display:flex; align-items:center; gap:8px; font-size:20px; font-weight:800; }
+    .logo svg { color:var(--green); }
+    .user-pill { display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--border); border-radius:100px; padding:6px 14px 6px 6px; font-size:13px; }
+    .avatar { width:28px; height:28px; border-radius:50%; background:var(--green); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#000; overflow:hidden; }
+    .avatar img { width:100%; height:100%; object-fit:cover; }
 
-    /* NAV */
-    .nav { display: flex; gap: 4px; padding: 20px 32px 0; border-bottom: 1px solid var(--border); position: relative; z-index: 1; overflow-x: auto; }
-    .nav::-webkit-scrollbar { display: none; }
-    .nav-tab { background: none; border: none; color: var(--muted); font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600; padding: 10px 18px 12px; cursor: pointer; border-bottom: 2px solid transparent; transition: color 0.2s, border-color 0.2s; white-space: nowrap; margin-bottom: -1px; }
-    .nav-tab:hover { color: var(--text); }
-    .nav-tab.active { color: var(--green); border-bottom-color: var(--green); }
+    .nav { display:flex; gap:4px; padding:20px 32px 0; border-bottom:1px solid var(--border); overflow-x:auto; position:relative; z-index:1; }
+    .nav::-webkit-scrollbar { display:none; }
+    .nav button { background:none; border:none; color:var(--muted); font-family:'Syne',sans-serif; font-size:14px; font-weight:600; padding:10px 18px 12px; cursor:pointer; border-bottom:2px solid transparent; white-space:nowrap; margin-bottom:-1px; transition:color .2s,border-color .2s; }
+    .nav button:hover { color:var(--text); }
+    .nav button.active { color:var(--green); border-bottom-color:var(--green); }
 
-    /* MAIN */
-    .main { padding: 28px 32px; position: relative; z-index: 1; }
-    .section-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 20px; }
-    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .main { padding:28px 32px; position:relative; z-index:1; }
+    .page { display:none; }
+    .page.active { display:block; }
+    h2.title { font-size:22px; font-weight:800; letter-spacing:-.5px; margin-bottom:20px; }
+    .sec-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
 
-    /* PLAYER */
-    .player-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 28px; display: flex; gap: 28px; align-items: center; margin-bottom: 20px; }
-    .player-art { width: 140px; height: 140px; border-radius: 12px; background: var(--surface2); flex-shrink: 0; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
-    .player-art img { width: 100%; height: 100%; object-fit: cover; }
-    .player-art-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 40px; }
-    .player-info { flex: 1; min-width: 0; }
-    .player-track { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .player-artist { color: var(--muted); font-size: 14px; margin-bottom: 20px; font-family: 'DM Mono', monospace; }
-    .player-controls { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
-    .ctrl-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 20px; display: flex; align-items: center; transition: color 0.2s; padding: 4px; }
-    .ctrl-btn:hover { color: var(--text); }
-    .ctrl-btn.play { background: var(--green); color: #000; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-    .ctrl-btn.play:hover { background: #22d462; color: #000; }
-    .progress-bar { width: 100%; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
-    .progress-fill { height: 100%; background: var(--green); border-radius: 2px; transition: width 0.5s linear; }
-    .player-time { display: flex; justify-content: space-between; font-size: 11px; font-family: 'DM Mono', monospace; color: var(--muted); margin-top: 6px; }
-    .playing-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(29,185,84,0.15); border: 1px solid rgba(29,185,84,0.3); color: var(--green); border-radius: 100px; padding: 4px 10px; font-size: 11px; font-family: 'DM Mono', monospace; margin-bottom: 8px; }
-    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 1.5s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.3} }
+    .player-card { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:28px; display:flex; gap:28px; align-items:center; margin-bottom:20px; }
+    .art { width:140px; height:140px; border-radius:12px; background:var(--surface2); flex-shrink:0; overflow:hidden; box-shadow:0 8px 32px rgba(0,0,0,.5); }
+    .art img { width:100%; height:100%; object-fit:cover; }
+    .art-ph { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:40px; color:var(--muted); }
+    .pinfo { flex:1; min-width:0; }
+    .badge { display:inline-flex; align-items:center; gap:6px; background:rgba(29,185,84,.15); border:1px solid rgba(29,185,84,.3); color:var(--green); border-radius:100px; padding:4px 10px; font-size:11px; font-family:'DM Mono',monospace; margin-bottom:8px; }
+    .dot { width:6px; height:6px; border-radius:50%; background:var(--green); animation:pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .track-title { font-size:22px; font-weight:800; letter-spacing:-.5px; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .track-sub { color:var(--muted); font-size:14px; margin-bottom:20px; font-family:'DM Mono',monospace; }
+    .controls { display:flex; align-items:center; gap:16px; margin-bottom:16px; }
+    .ctrl { background:none; border:none; color:var(--muted); cursor:pointer; font-size:20px; display:flex; align-items:center; padding:4px; transition:color .2s; }
+    .ctrl:hover { color:var(--text); }
+    .ctrl.play { background:var(--green); color:#000; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+    .ctrl.play:hover { background:#22d462; color:#000; }
+    .progress { width:100%; height:4px; background:var(--border); border-radius:2px; overflow:hidden; }
+    .progress-fill { height:100%; background:var(--green); border-radius:2px; transition:width .5s linear; }
+    .times { display:flex; justify-content:space-between; font-size:11px; font-family:'DM Mono',monospace; color:var(--muted); margin-top:6px; }
+    .add-btn { background:rgba(29,185,84,.15); border:1px solid rgba(29,185,84,.3); color:var(--green); font-family:'Syne',sans-serif; font-size:12px; font-weight:700; border-radius:6px; padding:5px 10px; cursor:pointer; white-space:nowrap; }
+    .add-btn:hover { background:rgba(29,185,84,.25); }
 
-    /* GRIDS */
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
-    .grid-5 { display: grid; grid-template-columns: repeat(5,1fr); gap: 12px; }
+    .grid-5 { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:20px; }
+    .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px; }
 
-    /* ARTIST */
-    .artist-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; text-align: center; cursor: pointer; transition: border-color 0.2s, transform 0.2s; }
-    .artist-card:hover { border-color: var(--green); transform: translateY(-2px); }
-    .artist-img { width: 80px; height: 80px; border-radius: 50%; background: var(--surface2); margin: 0 auto 10px; overflow: hidden; }
-    .artist-img img { width: 100%; height: 100%; object-fit: cover; }
-    .artist-img-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: var(--muted); }
-    .artist-name { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
-    .artist-genre { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .artist-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; text-align:center; transition:border-color .2s,transform .2s; cursor:pointer; }
+    .artist-card:hover { border-color:var(--green); transform:translateY(-2px); }
+    .aimg { width:80px; height:80px; border-radius:50%; background:var(--surface2); margin:0 auto 10px; overflow:hidden; }
+    .aimg img { width:100%; height:100%; object-fit:cover; }
+    .aname { font-size:13px; font-weight:700; margin-bottom:2px; }
+    .agenre { font-size:11px; color:var(--muted); font-family:'DM Mono',monospace; }
 
-    /* TRACKS */
-    .track-list { display: flex; flex-direction: column; gap: 4px; }
-    .track-row { display: flex; align-items: center; gap: 14px; padding: 10px 14px; border-radius: 10px; cursor: pointer; transition: background 0.15s; border: 1px solid transparent; }
-    .track-row:hover { background: var(--surface2); }
-    .track-row.active-track { background: rgba(29,185,84,0.08); border-color: rgba(29,185,84,0.2); }
-    .track-num { width: 24px; text-align: right; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 13px; flex-shrink: 0; }
-    .track-art { width: 42px; height: 42px; border-radius: 6px; background: var(--surface2); overflow: hidden; flex-shrink: 0; }
-    .track-art img { width: 100%; height: 100%; object-fit: cover; }
-    .track-info { flex: 1; min-width: 0; }
-    .track-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .track-artist-name { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .track-duration { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; flex-shrink: 0; }
+    .track-list { display:flex; flex-direction:column; gap:4px; }
+    .track-row { display:flex; align-items:center; gap:14px; padding:10px 14px; border-radius:10px; cursor:pointer; transition:background .15s; border:1px solid transparent; }
+    .track-row:hover { background:var(--surface2); }
+    .track-row.active { background:rgba(29,185,84,.08); border-color:rgba(29,185,84,.2); }
+    .tnum { width:24px; text-align:right; color:var(--muted); font-family:'DM Mono',monospace; font-size:13px; flex-shrink:0; }
+    .tart { width:42px; height:42px; border-radius:6px; background:var(--surface2); overflow:hidden; flex-shrink:0; }
+    .tart img { width:100%; height:100%; object-fit:cover; }
+    .tinfo { flex:1; min-width:0; }
+    .tname { font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .tartist { font-size:12px; color:var(--muted); font-family:'DM Mono',monospace; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .tdur { font-size:12px; color:var(--muted); font-family:'DM Mono',monospace; flex-shrink:0; }
 
-    /* SEARCH */
-    .search-box { display: flex; gap: 10px; margin-bottom: 24px; }
-    .search-input { flex: 1; width: auto; border-radius: 12px; padding: 14px 18px; font-family: 'Syne', sans-serif; font-size: 15px; }
+    .search-box { display:flex; gap:10px; margin-bottom:24px; }
+    .search-box input { border-radius:12px; padding:14px 18px; font-family:'Syne',sans-serif; font-size:15px; }
 
-    /* PLAYLIST */
-    .playlist-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-top: 24px; }
-    .playlist-panel h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-    .playlist-items { display: flex; flex-direction: column; gap: 6px; max-height: 300px; overflow-y: auto; margin-bottom: 16px; }
-    .playlist-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--surface2); border-radius: 8px; font-size: 13px; }
-    .playlist-item-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .playlist-item-remove { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 0 4px; }
-    .playlist-item-remove:hover { color: #ff6b6b; }
-    .playlist-form { display: flex; gap: 10px; flex-wrap: wrap; }
-    .playlist-name-input { flex: 1; min-width: 180px; width: auto; }
+    .pl-panel { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:20px; margin-top:24px; }
+    .pl-panel h3 { font-size:16px; font-weight:700; margin-bottom:16px; }
+    .pl-items { display:flex; flex-direction:column; gap:6px; max-height:300px; overflow-y:auto; margin-bottom:16px; }
+    .pl-item { display:flex; align-items:center; gap:10px; padding:8px 10px; background:var(--surface2); border-radius:8px; font-size:13px; }
+    .pl-item-name { flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .pl-remove { background:none; border:none; color:var(--muted); cursor:pointer; font-size:16px; padding:0 4px; }
+    .pl-remove:hover { color:#ff6b6b; }
+    .pl-form { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .pl-form input { flex:1; min-width:180px; }
 
-    /* STATS */
-    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
-    .stat-val { font-size: 36px; font-weight: 800; color: var(--green); letter-spacing: -1px; }
-    .stat-label { color: var(--muted); font-size: 13px; font-family: 'DM Mono', monospace; margin-top: 4px; }
-    .genre-bar-row { display: flex; flex-direction: column; gap: 10px; }
-    .genre-bar-item { display: flex; flex-direction: column; gap: 4px; }
-    .genre-bar-label { display: flex; justify-content: space-between; font-size: 12px; font-family: 'DM Mono', monospace; color: var(--muted); }
-    .genre-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
-    .genre-bar-fill { height: 100%; background: var(--green); border-radius: 3px; transition: width 1s ease; }
+    .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:20px; }
+    .stat-val { font-size:36px; font-weight:800; color:var(--green); letter-spacing:-1px; }
+    .stat-label { color:var(--muted); font-size:13px; font-family:'DM Mono',monospace; margin-top:4px; }
+    .genre-list { display:flex; flex-direction:column; gap:10px; }
+    .genre-item { display:flex; flex-direction:column; gap:4px; }
+    .genre-label { display:flex; justify-content:space-between; font-size:12px; font-family:'DM Mono',monospace; color:var(--muted); }
+    .genre-bar { height:6px; background:var(--border); border-radius:3px; overflow:hidden; }
+    .genre-fill { height:100%; background:var(--green); border-radius:3px; }
 
-    /* MISC */
-    .loading { display: flex; align-items: center; justify-content: center; padding: 60px; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 14px; gap: 10px; }
-    .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: spin 0.7s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 14px; line-height: 2; }
-    .tag { display: inline-block; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; font-size: 11px; font-family: 'DM Mono', monospace; color: var(--muted); }
-    .time-select { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; padding: 6px 10px; cursor: pointer; outline: none; width: auto; }
-    .add-btn { background: rgba(29,185,84,0.15); border: 1px solid rgba(29,185,84,0.3); color: var(--green); font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; border-radius: 6px; padding: 5px 10px; cursor: pointer; white-space: nowrap; }
-    .add-btn:hover { background: rgba(29,185,84,0.25); }
+    .loading { display:flex; align-items:center; justify-content:center; padding:60px; color:var(--muted); font-family:'DM Mono',monospace; font-size:14px; gap:10px; }
+    .spinner { width:20px; height:20px; border:2px solid var(--border); border-top-color:var(--green); border-radius:50%; animation:spin .7s linear infinite; }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    .empty { text-align:center; padding:60px 20px; color:var(--muted); font-family:'DM Mono',monospace; font-size:14px; line-height:2; }
+    .tag { display:inline-block; background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:3px 8px; font-size:11px; font-family:'DM Mono',monospace; color:var(--muted); }
+    select { background:var(--surface2); border:1px solid var(--border); border-radius:8px; color:var(--text); font-family:'DM Mono',monospace; font-size:12px; padding:6px 10px; cursor:pointer; outline:none; }
 
-    @media (max-width: 700px) {
-      .grid-5 { grid-template-columns: repeat(3,1fr); }
-      .grid-3 { grid-template-columns: repeat(2,1fr); }
-      .grid-2 { grid-template-columns: 1fr; }
-      .player-card { flex-direction: column; align-items: flex-start; }
-      .main, .header, .nav { padding-left: 16px; padding-right: 16px; }
+    @media(max-width:700px){
+      .grid-5{grid-template-columns:repeat(3,1fr)}
+      .grid-3{grid-template-columns:repeat(2,1fr)}
+      .grid-2{grid-template-columns:1fr}
+      .player-card{flex-direction:column;align-items:flex-start}
+      .main,.header,.nav{padding-left:16px;padding-right:16px}
     }
   </style>
 </head>
 <body>
-  <div id="root"></div>
-  <script type="text/babel">
-    const { useState, useEffect, useRef, useCallback } = React;
-    const SPOTIFY_BASE = 'https://api.spotify.com/v1';
-    const SCOPES = ['user-read-playback-state','user-modify-playback-state','user-top-read','user-read-recently-played','playlist-modify-private','playlist-modify-public'].join(' ');
+<div id="root"></div>
+<script>
+const BASE = 'https://api.spotify.com/v1';
+const SCOPES = 'user-read-playback-state user-modify-playback-state user-top-read user-read-recently-played playlist-modify-private playlist-modify-public';
+const LOGO_SVG = `<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>`;
 
-    function ms2time(ms) {
-      if (!ms) return '0:00';
-      const s = Math.floor(ms / 1000);
-      return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+let TOKEN = '', USER = null, PLAYBACK = null;
+let TOP_TRACKS = [], TOP_ARTISTS = [], RECENT = [], SEARCH_RES = [];
+let PL_QUEUE = [], PL_NAME = 'My Playlist', TIME_RANGE = 'medium_term';
+let ACTIVE_TAB = 'player', POLL = null;
+
+function esc(s){ return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
+function ms2t(ms){ if(!ms)return'0:00'; const s=Math.floor(ms/1000); return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`; }
+function $(id){ return document.getElementById(id); }
+function html(id,h){ const e=$(id); if(e) e.innerHTML=h; }
+
+async function api(path, method='GET', body=null){
+  const r = await fetch(BASE+path,{method,headers:{'Authorization':'Bearer '+TOKEN,'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});
+  if(r.status===401){TOKEN='';USER=null;renderLogin();throw new Error('401');}
+  if(r.status===204||r.status===202)return null;
+  if(!r.ok)throw new Error(r.status);
+  return r.json();
+}
+
+async function initUser(tok){
+  try{
+    const r=await fetch(BASE+'/me',{headers:{'Authorization':'Bearer '+tok}});
+    if(!r.ok){showErr('Token non valido o scaduto.');return;}
+    USER=await r.json(); TOKEN=tok; startApp();
+  }catch{showErr('Errore di connessione.');}
+}
+
+function showErr(msg){
+  const e=$('msg'); if(!e)return;
+  e.className='error'; e.textContent=msg; e.style.display='block';
+}
+
+// ── LOGIN ─────────────────────────────
+function renderLogin(){
+  const redir = location.origin+location.pathname;
+  const saved = localStorage.getItem('sid')||'';
+  $('root').innerHTML = `
+  <div class="token-screen">
+    <div class="token-logo">${LOGO_SVG} Spotify WebApp</div>
+    <div class="token-card">
+      <h2>🚀 Accesso con Spotify</h2>
+      <div id="msg" style="display:none"></div>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div>Vai su <a href="https://developer.spotify.com/dashboard" target="_blank">developer.spotify.com/dashboard</a> → <b>Create app</b></div></div>
+        <div class="step"><div class="step-num">2</div><div>Aggiungi questo Redirect URI: <code>${redir}</code></div></div>
+        <div class="step"><div class="step-num">3</div><div>Copia il <b>Client ID</b> e incollalo qui sotto</div></div>
+      </div>
+      <div class="row">
+        <input type="text" id="cid" placeholder="Client ID (es. a1b2c3d4...)" value="${esc(saved)}">
+        <a class="btn" id="oLink" href="#" target="_self">Autorizza →</a>
+      </div>
+      <div class="divider">oppure inserisci manualmente</div>
+      <div class="row">
+        <input type="text" id="mtok" placeholder="Access token manuale (BQA...)">
+        <button class="btn" id="mBtn">Entra</button>
+      </div>
+    </div>
+  </div>`;
+
+  function updateLink(){
+    const id = $('cid').value.trim();
+    if(id){
+      localStorage.setItem('sid',id);
+      $('oLink').href=`https://accounts.spotify.com/authorize?client_id=${id}&response_type=token&redirect_uri=${encodeURIComponent(redir)}&scope=${encodeURIComponent(SCOPES)}`;
+      $('oLink').style.opacity='1';
+    } else {
+      $('oLink').href='#';
+      $('oLink').style.opacity='0.5';
     }
+  }
+  $('cid').oninput = updateLink;
+  updateLink();
+  $('mBtn').onclick = function(){ const t=$('mtok').value.trim(); if(t) initUser(t); };
+  $('mtok').onkeydown = e=>{ if(e.key==='Enter') $('mBtn').click(); };
+}
 
-    function SpotifyIcon() {
-      return React.createElement('svg', { width:24, height:24, viewBox:'0 0 24 24', fill:'currentColor' },
-        React.createElement('path', { d:'M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z' })
-      );
-    }
+// ── APP ───────────────────────────────
+function startApp(){
+  if(POLL) clearInterval(POLL);
+  $('root').innerHTML = `
+  <div class="header">
+    <div class="logo">${LOGO_SVG} Spotify WebApp</div>
+    <div class="user-pill">
+      <div class="avatar">${USER?.images?.[0]?.url?`<img src="${USER.images[0].url}">`:(USER?.display_name?.[0]||'?')}</div>
+      <span>${esc(USER?.display_name||'')}</span>
+    </div>
+  </div>
+  <div class="nav">
+    <button class="active" data-t="player">▶ Now Playing</button>
+    <button data-t="top">🏆 Top Charts</button>
+    <button data-t="search">🔍 Cerca &amp; Playlist</button>
+    <button data-t="history">📋 Cronologia</button>
+  </div>
+  <div class="main">
+    <div class="page active" id="page-player"></div>
+    <div class="page" id="page-top"></div>
+    <div class="page" id="page-search"></div>
+    <div class="page" id="page-history"></div>
+  </div>`;
 
-    function App() {
-      const [token, setToken] = useState('');
-      const [tokenInput, setTokenInput] = useState('');
-      const [clientId, setClientId] = useState('');
-      const [error, setError] = useState('');
-      const [user, setUser] = useState(null);
-      const [activeTab, setActiveTab] = useState('player');
-      const [playback, setPlayback] = useState(null);
-      const [topTracks, setTopTracks] = useState([]);
-      const [topArtists, setTopArtists] = useState([]);
-      const [recentTracks, setRecentTracks] = useState([]);
-      const [searchQuery, setSearchQuery] = useState('');
-      const [searchResults, setSearchResults] = useState([]);
-      const [playlistQueue, setPlaylistQueue] = useState([]);
-      const [playlistName, setPlaylistName] = useState('My Playlist');
-      const [loading, setLoadState] = useState({});
-      const [timeRange, setTimeRange] = useState('medium_term');
-      const [success, setSuccess] = useState('');
-      const pollRef = useRef(null);
+  document.querySelectorAll('.nav button').forEach(b=>{
+    b.onclick=()=>{ document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); goTab(b.dataset.t); };
+  });
 
-      const setL = (k,v) => setLoadState(p => ({...p,[k]:v}));
+  goTab('player');
+  pollPb();
+  POLL = setInterval(pollPb,5000);
+}
 
-      useEffect(() => {
-        const hash = window.location.hash;
-        if (hash) {
-          const params = new URLSearchParams(hash.replace('#','?'));
-          const tok = params.get('access_token');
-          if (tok) { window.history.replaceState(null,'',window.location.pathname); initUser(tok); }
-        }
-        const saved = localStorage.getItem('spotify_client_id');
-        if (saved) setClientId(saved);
-      }, []);
+function goTab(t){
+  ACTIVE_TAB=t;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  $('page-'+t).classList.add('active');
+  if(t==='player') renderPlayer();
+  if(t==='top') loadTop();
+  if(t==='search') renderSearch();
+  if(t==='history') loadHistory();
+}
 
-      const startOAuth = () => {
-        if (!clientId.trim()) { setError('Inserisci prima il Client ID!'); return; }
-        localStorage.setItem('spotify_client_id', clientId.trim());
-        const redirectUri = window.location.origin + window.location.pathname;
-        window.location.href = `https://accounts.spotify.com/authorize?client_id=${clientId.trim()}&response_type=token&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(SCOPES)}`;
-      };
+// ── PLAYER ────────────────────────────
+async function pollPb(){
+  try{ PLAYBACK=await api('/me/player'); }catch{}
+  if(ACTIVE_TAB==='player') renderPlayer();
+}
 
-      const api = useCallback(async (path, method='GET', body=null) => {
-        const res = await fetch(`${SPOTIFY_BASE}${path}`, {
-          method,
-          headers: { Authorization:`Bearer ${token}`, 'Content-Type':'application/json' },
-          ...(body ? { body: JSON.stringify(body) } : {}),
-        });
-        if (res.status === 401) { setToken(''); setUser(null); throw new Error('expired'); }
-        if (res.status === 204 || res.status === 202) return null;
-        if (!res.ok) throw new Error(`${res.status}`);
-        return res.json();
-      }, [token]);
+function renderPlayer(){
+  const el=$('page-player'); if(!el)return;
+  const tr=PLAYBACK?.item, ip=PLAYBACK?.is_playing, prog=tr?(PLAYBACK.progress_ms/tr.duration_ms*100):0, dev=PLAYBACK?.device;
+  el.innerHTML = `<h2 class="title">Now Playing</h2>`+(tr?`
+  <div class="player-card">
+    <div class="art">${tr.album?.images?.[0]?.url?`<img src="${tr.album.images[0].url}">`:'<div class="art-ph">🎵</div>'}</div>
+    <div class="pinfo">
+      ${ip?'<div class="badge"><div class="dot"></div>IN RIPRODUZIONE</div>':''}
+      <div class="track-title">${esc(tr.name)}</div>
+      <div class="track-sub">${esc(tr.artists?.map(a=>a.name).join(', '))} · ${esc(tr.album?.name||'')}</div>
+      <div class="controls">
+        <button class="ctrl" onclick="pc('prev')">⏮</button>
+        <button class="ctrl play" onclick="pc('${ip?'pause':'play'}')">${ip?'⏸':'▶'}</button>
+        <button class="ctrl" onclick="pc('next')">⏭</button>
+        <button class="add-btn" style="margin-left:8px" onclick="addQ(${JSON.stringify(JSON.stringify(tr))})">+ Playlist</button>
+      </div>
+      <div class="progress"><div class="progress-fill" style="width:${prog}%"></div></div>
+      <div class="times"><span>${ms2t(PLAYBACK.progress_ms)}</span><span>${ms2t(tr.duration_ms)}</span></div>
+    </div>
+  </div>`:'<div class="empty">Nessuna riproduzione attiva.<br>Avvia Spotify su un dispositivo.</div>')+
+  (dev?`<div class="stat-card"><span style="font-size:13px;font-family:'DM Mono',monospace;color:var(--muted)">🔊 <b style="color:var(--text)">${esc(dev.name)}</b> · ${esc(dev.type)} · ${dev.volume_percent}% vol</span></div>`:'');
+}
 
-      const initUser = useCallback(async (tok) => {
-        try {
-          const res = await fetch(`${SPOTIFY_BASE}/me`, { headers: { Authorization:`Bearer ${tok}` } });
-          if (!res.ok) { setError('Token non valido o scaduto.'); return; }
-          setUser(await res.json()); setToken(tok); setError('');
-        } catch { setError('Errore di connessione.'); }
-      }, []);
+async function pc(action){
+  try{
+    if(action==='play') await api('/me/player/play','PUT');
+    if(action==='pause') await api('/me/player/pause','PUT');
+    if(action==='next') await api('/me/player/next','POST');
+    if(action==='prev') await api('/me/player/previous','POST');
+    setTimeout(async()=>{try{PLAYBACK=await api('/me/player');renderPlayer();}catch{}},600);
+  }catch{}
+}
 
-      useEffect(() => {
-        if (!token) return;
-        const poll = async () => { try { setPlayback(await api('/me/player')); } catch {} };
-        poll();
-        pollRef.current = setInterval(poll, 5000);
-        return () => clearInterval(pollRef.current);
-      }, [token, api]);
+async function playTrack(uri){
+  try{
+    await api('/me/player/play','PUT',{uris:[uri]});
+    setTimeout(async()=>{try{PLAYBACK=await api('/me/player');if(ACTIVE_TAB==='player')renderPlayer();}catch{}},600);
+  }catch{}
+}
 
-      useEffect(() => {
-        if (!token || activeTab !== 'top') return;
-        (async () => {
-          setL('top', true);
-          try {
-            const [t, a] = await Promise.all([
-              api(`/me/top/tracks?limit=20&time_range=${timeRange}`),
-              api(`/me/top/artists?limit=15&time_range=${timeRange}`),
-            ]);
-            setTopTracks(t?.items||[]); setTopArtists(a?.items||[]);
-          } catch {}
-          setL('top', false);
-        })();
-      }, [token, activeTab, timeRange, api]);
+// ── TOP ───────────────────────────────
+async function loadTop(){
+  html('page-top',`<div class="sec-header"><h2 class="title" style="margin:0">Top Charts</h2><select onchange="chTime(this.value)">${timeOpts()}</select></div><div class="loading"><div class="spinner"></div>Caricamento...</div>`);
+  try{
+    const [t,a]=await Promise.all([api(`/me/top/tracks?limit=20&time_range=${TIME_RANGE}`),api(`/me/top/artists?limit=15&time_range=${TIME_RANGE}`)]);
+    TOP_TRACKS=t?.items||[]; TOP_ARTISTS=a?.items||[]; renderTop();
+  }catch{ html('page-top','<div class="error" style="margin:20px">Errore nel caricamento.</div>'); }
+}
 
-      useEffect(() => {
-        if (!token || activeTab !== 'history') return;
-        (async () => {
-          setL('history', true);
-          try { setRecentTracks((await api('/me/player/recently-played?limit=50'))?.items||[]); } catch {}
-          setL('history', false);
-        })();
-      }, [token, activeTab, api]);
+function timeOpts(){
+  return ['short_term:Ultime 4 settimane','medium_term:Ultimi 6 mesi','long_term:Sempre'].map(x=>{
+    const[v,l]=x.split(':'); return `<option value="${v}"${TIME_RANGE===v?' selected':''}>${l}</option>`;
+  }).join('');
+}
 
-      const handleSearch = async () => {
-        if (!searchQuery.trim()) return;
-        setL('search', true);
-        try { setSearchResults((await api(`/search?q=${encodeURIComponent(searchQuery)}&type=track&limit=20`))?.tracks?.items||[]); } catch {}
-        setL('search', false);
-      };
+function chTime(v){ TIME_RANGE=v; loadTop(); }
 
-      const playControl = async (action) => {
-        try {
-          if (action==='play') await api('/me/player/play','PUT');
-          if (action==='pause') await api('/me/player/pause','PUT');
-          if (action==='next') await api('/me/player/next','POST');
-          if (action==='prev') await api('/me/player/previous','POST');
-          setTimeout(async()=>{ try{setPlayback(await api('/me/player'));}catch{} }, 600);
-        } catch {}
-      };
+function renderTop(){
+  const artists=TOP_ARTISTS.map(a=>`
+  <div class="artist-card">
+    <div class="aimg">${a.images?.[0]?.url?`<img src="${a.images[0].url}">`:'<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px">🎤</div>'}</div>
+    <div class="aname">${esc(a.name)}</div>
+    ${a.genres?.[0]?`<div class="agenre">${esc(a.genres[0])}</div>`:''}
+  </div>`).join('');
 
-      const playTrack = async (uri) => {
-        try {
-          await api('/me/player/play','PUT',{uris:[uri]});
-          setTimeout(async()=>{ try{setPlayback(await api('/me/player'));}catch{} }, 600);
-        } catch {}
-      };
+  const tracks=TOP_TRACKS.map((t,i)=>`
+  <div class="track-row${PLAYBACK?.item?.id===t.id?' active':''}" onclick="playTrack('${esc(t.uri)}')">
+    <div class="tnum">${i+1}</div>
+    <div class="tart">${t.album?.images?.[2]?.url?`<img src="${t.album.images[2].url}">`:''}></div>
+    <div class="tinfo"><div class="tname">${esc(t.name)}</div><div class="tartist">${esc(t.artists?.map(a=>a.name).join(', '))}</div></div>
+    <button class="add-btn" onclick="event.stopPropagation();addQById('${t.id}')">+</button>
+    <div class="tdur">${ms2t(t.duration_ms)}</div>
+  </div>`).join('');
 
-      const createPlaylist = async () => {
-        if (!playlistQueue.length||!playlistName.trim()) return;
-        setL('playlist',true);
-        try {
-          const pl = await api(`/users/${user.id}/playlists`,'POST',{name:playlistName,description:'Creata con Spotify WebApp',public:false});
-          await api(`/playlists/${pl.id}/tracks`,'POST',{uris:playlistQueue.map(t=>t.uri)});
-          setSuccess(`Playlist "${playlistName}" creata con ${playlistQueue.length} brani! 🎉`);
-          setPlaylistQueue([]);
-          setTimeout(()=>setSuccess(''),4000);
-        } catch { setError('Errore nella creazione.'); }
-        setL('playlist',false);
-      };
+  html('page-top',`
+  <div class="sec-header"><h2 class="title" style="margin:0">Top Charts</h2><select onchange="chTime(this.value)">${timeOpts()}</select></div>
+  <div class="grid-2">
+    <div><h2 class="title" style="font-size:16px">🎤 Artisti</h2><div class="grid-5">${artists}</div></div>
+    <div><h2 class="title" style="font-size:16px">🎵 Brani</h2><div class="track-list">${tracks}</div></div>
+  </div>`);
+}
 
-      const addToQueue = (track) => { if (!playlistQueue.find(t=>t.id===track.id)) setPlaylistQueue(p=>[...p,track]); };
+// ── SEARCH ────────────────────────────
+function renderSearch(){
+  const qItems = PL_QUEUE.length
+    ? `<div class="pl-items">${PL_QUEUE.map((t,i)=>`
+      <div class="pl-item">
+        <span style="color:var(--muted);font-family:'DM Mono',monospace;font-size:12px;width:18px">${i+1}</span>
+        <span class="pl-item-name">${esc(t.name)} – ${esc(t.artists?.[0]?.name||'')}</span>
+        <button class="pl-remove" onclick="rmQ('${t.id}')">✕</button>
+      </div>`).join('')}</div>`
+    : `<p style="color:var(--muted);font-size:13px;font-family:'DM Mono',monospace;margin-bottom:16px">Aggiungi brani con <b>+ Playlist</b></p>`;
 
-      const genreStats = (() => {
-        const c={};
-        topArtists.forEach(a=>a.genres?.forEach(g=>{c[g]=(c[g]||0)+1}));
-        return Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,8);
-      })();
-      const maxGenre = genreStats[0]?.[1]||1;
+  html('page-search',`
+  <h2 class="title">🔍 Cerca Brani</h2>
+  <div class="search-box">
+    <input type="text" id="sq" placeholder="Cerca un brano, artista...">
+    <button class="btn" onclick="doSearch()">Cerca</button>
+  </div>
+  <div id="sr"></div>
+  <div class="pl-panel">
+    <h3>📝 Crea Playlist ${PL_QUEUE.length?`<span class="tag">${PL_QUEUE.length} brani</span>`:''}</h3>
+    <div id="plMsg" style="display:none" class="ok"></div>
+    ${qItems}
+    <div class="pl-form">
+      <input type="text" id="pln" placeholder="Nome della playlist..." value="${esc(PL_NAME)}" oninput="PL_NAME=this.value">
+      <button class="btn" onclick="createPl()" ${!PL_QUEUE.length?'disabled':''}>Crea su Spotify ✓</button>
+      ${PL_QUEUE.length?'<button class="btn-ghost" onclick="clearQ()">Svuota</button>':''}
+    </div>
+  </div>`);
 
-      if (!token) {
-        const redirectUri = window.location.origin + window.location.pathname;
-        return (
-          <div className="app">
-            <div className="token-screen">
-              <div className="token-logo"><SpotifyIcon /> Spotify WebApp</div>
-              <div className="token-card">
-                <h2>🚀 Accesso con Spotify</h2>
-                {error && <div className="error-msg">{error}</div>}
-                <div className="steps">
-                  <div className="step"><div className="step-num">1</div><div>Vai su <a href="https://developer.spotify.com/dashboard" target="_blank">developer.spotify.com/dashboard</a> → <strong>Create app</strong></div></div>
-                  <div className="step"><div className="step-num">2</div><div>Aggiungi Redirect URI: <code>{redirectUri}</code></div></div>
-                  <div className="step"><div className="step-num">3</div><div>Copia il <strong>Client ID</strong> e incollalo qui</div></div>
-                </div>
-                <div className="oauth-row">
-                  <input className="client-input" placeholder="Client ID (es. a1b2c3d4...)" value={clientId} onChange={e=>setClientId(e.target.value)} onKeyDown={e=>e.key==='Enter'&&startOAuth()} />
-                  <button className="btn-primary" onClick={startOAuth}>Autorizza →</button>
-                </div>
-                <div className="divider">oppure inserisci manualmente</div>
-                <div className="token-input-row">
-                  <input className="token-input" placeholder="Access token manuale (BQA...)" value={tokenInput} onChange={e=>setTokenInput(e.target.value)} onKeyDown={e=>e.key==='Enter'&&initUser(tokenInput.trim())} />
-                  <button className="btn-primary" onClick={()=>initUser(tokenInput.trim())}>Entra</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      }
+  $('sq').onkeydown = e=>{ if(e.key==='Enter') doSearch(); };
+}
 
-      const isPlaying = playback?.is_playing;
-      const track = playback?.item;
-      const progress = track ? (playback.progress_ms/track.duration_ms)*100 : 0;
-      const tabs = [{id:'player',label:'▶ Now Playing'},{id:'top',label:'🏆 Top Charts'},{id:'search',label:'🔍 Cerca & Playlist'},{id:'history',label:'📋 Cronologia'}];
+async function doSearch(){
+  const q=$('sq')?.value?.trim(); if(!q)return;
+  html('sr','<div class="loading"><div class="spinner"></div>Ricerca...</div>');
+  try{
+    const d=await api(`/search?q=${encodeURIComponent(q)}&type=track&limit=20`);
+    SEARCH_RES=d?.tracks?.items||[];
+    html('sr',SEARCH_RES.map(t=>`
+    <div class="track-row${PLAYBACK?.item?.id===t.id?' active':''}" onclick="playTrack('${esc(t.uri)}')">
+      <div class="tart">${t.album?.images?.[2]?.url?`<img src="${t.album.images[2].url}">`:''}></div>
+      <div class="tinfo"><div class="tname">${esc(t.name)}</div><div class="tartist">${esc(t.artists?.map(a=>a.name).join(', '))} · ${esc(t.album?.name||'')}</div></div>
+      ${t.explicit?'<span class="tag">explicit</span>':''}
+      <button class="add-btn" onclick="event.stopPropagation();addQById('${t.id}')">+ Playlist</button>
+      <div class="tdur">${ms2t(t.duration_ms)}</div>
+    </div>`).join('')||'<div class="empty">Nessun risultato.</div>');
+  }catch{html('sr','<div class="error">Errore nella ricerca.</div>');}
+}
 
-      return (
-        <div className="app">
-          <div className="header">
-            <div className="header-logo"><SpotifyIcon /> Spotify WebApp</div>
-            <div className="user-pill">
-              <div className="user-avatar">{user?.images?.[0]?.url?<img src={user.images[0].url} alt=""/>:user?.display_name?.[0]?.toUpperCase()}</div>
-              <span>{user?.display_name}</span>
-            </div>
-          </div>
-          <div className="nav">
-            {tabs.map(t=><button key={t.id} className={`nav-tab${activeTab===t.id?' active':''}`} onClick={()=>setActiveTab(t.id)}>{t.label}</button>)}
-          </div>
-          <div className="main">
+function addQ(jsonStr){
+  try{ const t=JSON.parse(jsonStr); if(!PL_QUEUE.find(x=>x.id===t.id)){PL_QUEUE.push(t);} if(ACTIVE_TAB==='search')renderSearch(); }catch{}
+}
+function addQById(id){
+  const t=[...TOP_TRACKS,...SEARCH_RES,PLAYBACK?.item].filter(Boolean).find(x=>x.id===id);
+  if(t&&!PL_QUEUE.find(x=>x.id===t.id)){PL_QUEUE.push(t);if(ACTIVE_TAB==='search')renderSearch();}
+}
+function rmQ(id){ PL_QUEUE=PL_QUEUE.filter(t=>t.id!==id); if(ACTIVE_TAB==='search')renderSearch(); }
+function clearQ(){ PL_QUEUE=[]; if(ACTIVE_TAB==='search')renderSearch(); }
 
-            {activeTab==='player' && <>
-              <div className="section-title">Now Playing</div>
-              {track ? (
-                <div className="player-card">
-                  <div className="player-art">{track.album?.images?.[0]?.url?<img src={track.album.images[0].url} alt=""/>:<div className="player-art-placeholder">🎵</div>}</div>
-                  <div className="player-info">
-                    {isPlaying&&<div className="playing-badge"><div className="dot"/>IN RIPRODUZIONE</div>}
-                    <div className="player-track">{track.name}</div>
-                    <div className="player-artist">{track.artists?.map(a=>a.name).join(', ')} · {track.album?.name}</div>
-                    <div className="player-controls">
-                      <button className="ctrl-btn" onClick={()=>playControl('prev')}>⏮</button>
-                      <button className="ctrl-btn play" onClick={()=>playControl(isPlaying?'pause':'play')}>{isPlaying?'⏸':'▶'}</button>
-                      <button className="ctrl-btn" onClick={()=>playControl('next')}>⏭</button>
-                      <button className="add-btn" style={{marginLeft:8}} onClick={()=>addToQueue(track)}>+ Playlist</button>
-                    </div>
-                    <div className="progress-bar"><div className="progress-fill" style={{width:`${progress}%`}}/></div>
-                    <div className="player-time"><span>{ms2time(playback.progress_ms)}</span><span>{ms2time(track.duration_ms)}</span></div>
-                  </div>
-                </div>
-              ) : <div className="empty-state">Nessuna riproduzione attiva.<br/>Avvia Spotify su un dispositivo e riprova.</div>}
-              {playback?.device&&<div className="stat-card"><div style={{fontSize:13,fontFamily:"'DM Mono',monospace",color:'var(--muted)',display:'flex',gap:8,alignItems:'center'}}>🔊 <strong style={{color:'var(--text)'}}>{playback.device.name}</strong> · {playback.device.type} · {playback.device.volume_percent}% volume</div></div>}
-            </>}
+async function createPl(){
+  if(!PL_QUEUE.length||!PL_NAME.trim())return;
+  const btn=document.querySelector('.pl-form .btn'); if(btn)btn.disabled=true;
+  try{
+    const pl=await api(`/users/${USER.id}/playlists`,'POST',{name:PL_NAME,description:'Creata con Spotify WebApp',public:false});
+    await api(`/playlists/${pl.id}/tracks`,'POST',{uris:PL_QUEUE.map(t=>t.uri)});
+    const m=$('plMsg'); if(m){m.textContent=`"${PL_NAME}" creata con ${PL_QUEUE.length} brani! 🎉`;m.style.display='block';setTimeout(()=>m.style.display='none',4000);}
+    PL_QUEUE=[]; renderSearch();
+  }catch{ alert('Errore nella creazione.'); if(btn)btn.disabled=false; }
+}
 
-            {activeTab==='top' && <>
-              <div className="section-header">
-                <div className="section-title" style={{margin:0}}>Top Charts</div>
-                <select className="time-select" value={timeRange} onChange={e=>setTimeRange(e.target.value)}>
-                  <option value="short_term">Ultime 4 settimane</option>
-                  <option value="medium_term">Ultimi 6 mesi</option>
-                  <option value="long_term">Sempre</option>
-                </select>
-              </div>
-              {loading.top?<div className="loading"><div className="spinner"/>Caricamento...</div>:(
-                <div className="grid-2" style={{gap:28,marginTop:20}}>
-                  <div>
-                    <div className="section-title" style={{fontSize:16}}>🎤 Artisti</div>
-                    <div className="grid-5">
-                      {topArtists.map(a=>(
-                        <div className="artist-card" key={a.id}>
-                          <div className="artist-img">{a.images?.[0]?.url?<img src={a.images[0].url} alt=""/>:<div className="artist-img-placeholder">🎤</div>}</div>
-                          <div className="artist-name">{a.name}</div>
-                          {a.genres?.[0]&&<div className="artist-genre">{a.genres[0]}</div>}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="section-title" style={{fontSize:16}}>🎵 Brani</div>
-                    <div className="track-list">
-                      {topTracks.map((t,i)=>(
-                        <div key={t.id} className={`track-row${track?.id===t.id?' active-track':''}`} onClick={()=>playTrack(t.uri)}>
-                          <div className="track-num">{i+1}</div>
-                          <div className="track-art">{t.album?.images?.[2]?.url&&<img src={t.album.images[2].url} alt=""/>}</div>
-                          <div className="track-info"><div className="track-name">{t.name}</div><div className="track-artist-name">{t.artists?.map(a=>a.name).join(', ')}</div></div>
-                          <button className="add-btn" onClick={e=>{e.stopPropagation();addToQueue(t)}}>+</button>
-                          <div className="track-duration">{ms2time(t.duration_ms)}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </>}
+// ── HISTORY ───────────────────────────
+async function loadHistory(){
+  html('page-history','<h2 class="title">📋 Cronologia &amp; Stats</h2><div class="loading"><div class="spinner"></div>Caricamento...</div>');
+  try{
+    const d=await api('/me/player/recently-played?limit=50');
+    RECENT=d?.items||[]; renderHistory();
+  }catch{html('page-history','<div class="error" style="margin:20px">Errore.</div>');}
+}
 
-            {activeTab==='search' && <>
-              <div className="section-title">🔍 Cerca Brani</div>
-              <div className="search-box">
-                <input className="search-input" placeholder="Cerca un brano, artista..." value={searchQuery} onChange={e=>setSearchQuery(e.target.value)} onKeyDown={e=>e.key==='Enter'&&handleSearch()}/>
-                <button className="btn-primary" onClick={handleSearch}>Cerca</button>
-              </div>
-              {loading.search&&<div className="loading"><div className="spinner"/>Ricerca...</div>}
-              {searchResults.length>0&&(
-                <div className="track-list">
-                  {searchResults.map(t=>(
-                    <div key={t.id} className={`track-row${track?.id===t.id?' active-track':''}`} onClick={()=>playTrack(t.uri)}>
-                      <div className="track-art">{t.album?.images?.[2]?.url&&<img src={t.album.images[2].url} alt=""/>}</div>
-                      <div className="track-info"><div className="track-name">{t.name}</div><div className="track-artist-name">{t.artists?.map(a=>a.name).join(', ')} · {t.album?.name}</div></div>
-                      {t.explicit&&<span className="tag">explicit</span>}
-                      <button className="add-btn" onClick={e=>{e.stopPropagation();addToQueue(t)}}>+ Playlist</button>
-                      <div className="track-duration">{ms2time(t.duration_ms)}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <div className="playlist-panel">
-                <h3>📝 Crea Playlist {playlistQueue.length>0&&<span className="tag">{playlistQueue.length} brani</span>}</h3>
-                {success&&<div className="success-msg">{success}</div>}
-                {playlistQueue.length===0
-                  ?<p style={{color:'var(--muted)',fontSize:13,fontFamily:"'DM Mono',monospace",marginBottom:16}}>Aggiungi brani con <strong>+ Playlist</strong></p>
-                  :<div className="playlist-items">{playlistQueue.map((t,i)=>(
-                    <div className="playlist-item" key={t.id}>
-                      <span style={{color:'var(--muted)',fontFamily:"'DM Mono',monospace",fontSize:12,width:18}}>{i+1}</span>
-                      <span className="playlist-item-name">{t.name} – {t.artists?.[0]?.name}</span>
-                      <button className="playlist-item-remove" onClick={()=>setPlaylistQueue(p=>p.filter(x=>x.id!==t.id))}>✕</button>
-                    </div>
-                  ))}</div>
-                }
-                <div className="playlist-form">
-                  <input className="playlist-name-input" placeholder="Nome della playlist..." value={playlistName} onChange={e=>setPlaylistName(e.target.value)}/>
-                  <button className="btn-primary" onClick={createPlaylist} disabled={!playlistQueue.length||loading.playlist}>{loading.playlist?'Creazione...':'Crea su Spotify ✓'}</button>
-                  {playlistQueue.length>0&&<button className="btn-ghost" onClick={()=>setPlaylistQueue([])}>Svuota</button>}
-                </div>
-              </div>
-            </>}
+function renderHistory(){
+  const el=$('page-history'); if(!el)return;
+  const counts={}; TOP_ARTISTS.forEach(a=>a.genres?.forEach(g=>{counts[g]=(counts[g]||0)+1}));
+  const gs=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const maxG=gs[0]?.[1]||1;
 
-            {activeTab==='history' && <>
-              <div className="section-title">📋 Cronologia & Stats</div>
-              {topArtists.length>0&&(
-                <div className="grid-3" style={{marginBottom:28}}>
-                  <div className="stat-card"><div className="stat-val">{topArtists.length}</div><div className="stat-label">artisti nel tuo top</div></div>
-                  <div className="stat-card"><div className="stat-val">{topTracks.length}</div><div className="stat-label">brani nel tuo top</div></div>
-                  <div className="stat-card"><div className="stat-val">{recentTracks.length}</div><div className="stat-label">brani recenti</div></div>
-                </div>
-              )}
-              {genreStats.length>0&&(
-                <div className="stat-card" style={{marginBottom:28}}>
-                  <div className="section-title" style={{fontSize:16,marginBottom:16}}>🎸 Top Generi</div>
-                  <div className="genre-bar-row">
-                    {genreStats.map(([g,c])=>(
-                      <div className="genre-bar-item" key={g}>
-                        <div className="genre-bar-label"><span>{g}</span><span>{c}</span></div>
-                        <div className="genre-bar"><div className="genre-bar-fill" style={{width:`${(c/maxGenre)*100}%`}}/></div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              <div className="section-title" style={{fontSize:16}}>⏱ Ascoltato di Recente</div>
-              {loading.history?<div className="loading"><div className="spinner"/>Caricamento...</div>:recentTracks.length===0?<div className="empty-state">Nessun brano recente trovato.</div>:(
-                <div className="track-list">
-                  {recentTracks.map((item,i)=>{
-                    const t=item.track;
-                    const playedAt=new Date(item.played_at).toLocaleString('it-IT',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-                    return (
-                      <div key={`${t.id}-${i}`} className="track-row" onClick={()=>playTrack(t.uri)}>
-                        <div className="track-art">{t.album?.images?.[2]?.url&&<img src={t.album.images[2].url} alt=""/>}</div>
-                        <div className="track-info"><div className="track-name">{t.name}</div><div className="track-artist-name">{t.artists?.map(a=>a.name).join(', ')}</div></div>
-                        <div className="track-duration">{playedAt}</div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </>}
+  const stats=TOP_ARTISTS.length?`<div class="grid-3">
+    <div class="stat-card"><div class="stat-val">${TOP_ARTISTS.length}</div><div class="stat-label">artisti nel tuo top</div></div>
+    <div class="stat-card"><div class="stat-val">${TOP_TRACKS.length}</div><div class="stat-label">brani nel tuo top</div></div>
+    <div class="stat-card"><div class="stat-val">${RECENT.length}</div><div class="stat-label">brani recenti</div></div>
+  </div>`:'<p style="color:var(--muted);font-size:13px;font-family:\'DM Mono\',monospace;margin-bottom:16px">Visita <b>Top Charts</b> prima per vedere le statistiche.</p>';
 
-          </div>
-        </div>
-      );
-    }
+  const genres=gs.length?`<div class="stat-card" style="margin-bottom:28px"><h2 class="title" style="font-size:16px;margin-bottom:16px">🎸 Top Generi</h2><div class="genre-list">${
+    gs.map(([g,c])=>`<div class="genre-item"><div class="genre-label"><span>${esc(g)}</span><span>${c}</span></div><div class="genre-bar"><div class="genre-fill" style="width:${(c/maxG)*100}%"></div></div></div>`).join('')
+  }</div></div>`:'';
 
-    ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
-  </script>
+  const recent=RECENT.length?RECENT.map((item,i)=>{
+    const t=item.track;
+    const when=new Date(item.played_at).toLocaleString('it-IT',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    return `<div class="track-row" onclick="playTrack('${esc(t.uri)}')">
+      <div class="tart">${t.album?.images?.[2]?.url?`<img src="${t.album.images[2].url}">`:''}></div>
+      <div class="tinfo"><div class="tname">${esc(t.name)}</div><div class="tartist">${esc(t.artists?.map(a=>a.name).join(', '))}</div></div>
+      <div class="tdur">${when}</div>
+    </div>`;
+  }).join(''):'<div class="empty">Nessun brano recente.</div>';
+
+  el.innerHTML=`<h2 class="title">📋 Cronologia &amp; Stats</h2>${stats}${genres}<h2 class="title" style="font-size:16px;margin-top:8px">⏱ Ascoltato di Recente</h2><div class="track-list">${recent}</div>`;
+}
+
+// ── INIT ──────────────────────────────
+(function(){
+  const hash=location.hash;
+  if(hash){
+    const p=new URLSearchParams(hash.replace('#','?'));
+    const tok=p.get('access_token');
+    if(tok){ history.replaceState(null,'',location.pathname); initUser(tok); return; }
+  }
+  renderLogin();
+})();
+</script>
 </body>
 </html>
